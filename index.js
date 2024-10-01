@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors'); 
 const app = express()
 const { sql, connectToDatabase } = require('./db'); // นำเข้า db.js
+const { SendMail } = require('./sendMail')
 
 app.use(cors({
   origin: 'http://localhost:3000', // จำกัดเฉพาะ requests จาก localhost:3000
@@ -27,9 +28,10 @@ app.post('/', async (req, res) => {
       try {
         // แทรกข้อมูลลงในตาราง PetInformation
         const petInsertQuery = `
-            INSERT INTO PetInformation (name, species, breed, gender, color, bitrhDate, otherData, img)
-            VALUES (@name, @species, @breed, @gender, @color, @birthDate, @otherData, @img);
-        `;
+        INSERT INTO PetInformation (name, species, breed, gender, color, birthDate, otherData, img)
+        VALUES (@name, @species, @breed, @gender, @color, @birthDate, @otherData, @img);
+    `;
+    
 
         const ownerInsertQuery = `
             INSERT INTO OwnerInformation (patId, firstName, lastName, address, phoneNumber, email)
@@ -84,6 +86,8 @@ app.post('/', async (req, res) => {
             message: 'Data added successfully',
             user: dataFrom
         });
+          SendMail("pornthida.mue@spumail.net")
+
     } catch (err) {
         console.error('Error inserting data:', err);
         res.status(500).json({
