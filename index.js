@@ -2,12 +2,12 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors'); 
 const app = express()
-const { sql, connectToDatabase } = require('./db'); // นำเข้า db.js
+const { sql, connectToDatabase } = require('./db'); 
 const { SendMail } = require('./sendMail')
 
 app.use(cors({
-  origin: 'http://localhost:3000', // จำกัดเฉพาะ requests จาก localhost:3000
-  methods: ['GET', 'POST','PUT'], // อนุญาตเฉพาะ GET , PUT และ POST requests
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST','PUT'], 
 }));
 
 app.use(bodyParser.json())
@@ -15,10 +15,10 @@ app.use(bodyParser.json())
 var port = 3030;
 
 app.get('/' ,(req,res) => {
-  res.send("somethig")
+  res.send("Hello, welcome to our API")
 })
 
-connectToDatabase(); // เรียกใช้การเชื่อมต่อฐานข้อมูล
+connectToDatabase();
 
 app.post('/', async (req, res) => {
     let data = req.body;
@@ -31,7 +31,6 @@ app.post('/', async (req, res) => {
         INSERT INTO PetInformation (name, species, breed, gender, color, birthDate, otherData, img)
         VALUES (@name, @species, @breed, @gender, @color, @birthDate, @otherData, @img);
     `;
-    
 
         const ownerInsertQuery = `
             INSERT INTO OwnerInformation (patId, firstName, lastName, address, phoneNumber, email)
@@ -52,8 +51,7 @@ app.post('/', async (req, res) => {
         petRequest.input('color', sql.NVarChar, dataFrom.color);
         petRequest.input('birthDate', sql.Date, new Date(dataFrom.birthdate));
         petRequest.input('otherData', sql.NVarChar, dataFrom.otherData);
-        petRequest.input('img', sql.NVarChar, dataFrom.img || ''); // ใช้รูปภาพที่ระบุหรือค่าว่าง
-
+        petRequest.input('img', sql.NVarChar, dataFrom.img || ''); 
         await petRequest.query(petInsertQuery);
 
         // สมมติว่าคุณต้องการใช้ ID ล่าสุดที่แทรกใน PetInformation เป็น patId
@@ -86,7 +84,7 @@ app.post('/', async (req, res) => {
             message: 'Data added successfully',
             user: dataFrom
         });
-          SendMail("pornthida.mue@spumail.net")
+          SendMail("youmail")
 
     } catch (err) {
         console.error('Error inserting data:', err);
@@ -97,23 +95,15 @@ app.post('/', async (req, res) => {
     }
 });
 
-
-// GET all data
 app.get('/all-data', async (req, res) => {
   try {
-      // เชื่อมต่อฐานข้อมูล
+      // connect database
       const petRequest = new sql.Request();
 
-      // ดึงข้อมูลจากตาราง PetInformation
       const pets = await petRequest.query('SELECT * FROM PetInformation');
-
-      // ดึงข้อมูลจากตาราง OwnerInformation
       const owners = await petRequest.query('SELECT * FROM OwnerInformation');
-
-      // ดึงข้อมูลจากตาราง VeterinaryInformation
       const veterinarians = await petRequest.query('SELECT * FROM VeterinaryInformation');
 
-      // รวมผลลัพธ์
       res.json({
           pets: pets.recordset,
           owners: owners.recordset,
@@ -128,7 +118,7 @@ app.get('/all-data', async (req, res) => {
   }
 });
 
-// PUT Update Data
+
 app.put('/pets/:id', async (req, res) => {
   const petId = req.params.id;
   const data = req.body;
@@ -155,7 +145,7 @@ app.put('/pets/:id', async (req, res) => {
       petRequest.input('breed', sql.NVarChar, data.breed);
       petRequest.input('gender', sql.Char(1), data.gender);
       petRequest.input('color', sql.NVarChar, data.color);
-      petRequest.input('birthDate', sql.Date, new Date(data.birthdate));
+      petRequest.input('birthDate', sql.Date, new Date(data.birthDate));
       petRequest.input('otherData', sql.NVarChar, data.otherData);
       petRequest.input('img', sql.NVarChar, data.img || '');
 
@@ -173,7 +163,6 @@ app.put('/pets/:id', async (req, res) => {
   }
 });
 
-// PUT Update Data for OwnerInformation
 app.put('/owners/:patId', async (req, res) => {
   const patId = req.params.patId;
   const data = req.body;

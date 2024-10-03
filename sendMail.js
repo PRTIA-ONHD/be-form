@@ -5,13 +5,13 @@ function SendMail(sendTo) {
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'pornthida.mue@spumail.net',
-    pass: '1929900807901'
+    user: 'yourmail',
+    pass: 'yourpass'
   }
 });
 
 var mailOptions = {
-  from: "pornthida.mue@spumail.net",
+  from: "yourmail",
   to: `${sendTo}`,
   subject: "Sending Email using Node.js",
   html: `
